@@ -1,24 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
+import { ProjectsModule } from './modules/project/projects.module';
+import { DatabaseModule } from './database/database.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes the ConfigService available everywhere
+      envFilePath: '.env',
     }),
-
-    // 2. Configure the database connection
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL'),
-      }),
-      inject: [ConfigService],
-    }),
+    DatabaseModule,
+    ProjectsModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })
